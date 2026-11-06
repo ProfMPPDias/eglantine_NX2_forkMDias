@@ -5,12 +5,12 @@
     <message>
         <location filename="../../src/yuzu/aboutdialog.ui" line="14" />
         <source>About Eden</source>
-        <translation>Sobre o Eden</translation>
+        <translation>Sobre o fork MDias v2.0 - AMD</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/aboutdialog.ui" line="72" />
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:28pt;"&gt;Eden&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:28pt;"&gt;Eden&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:28pt;"&gt;fork MDias v2.0 - AMD&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/aboutdialog.ui" line="85" />
@@ -46,7 +46,7 @@ li.checked::marker { content: "\2612"; }
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:7pt;"&gt;&amp;quot;Nintendo Switch&amp;quot; is a trademark of Nintendo. Eden is not affiliated with Nintendo in any way.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:7pt;"&gt;&amp;quot;Nintendo Switch&amp;quot; é uma marca registrada da Nintendo. Eden não é afiliada à Nintendo de forma alguma.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
-</context>
+<message><source>About Lichii</source><translation>Sobre o fork MDias v2.0 - AMD</translation></message><message><source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:28pt;"&gt;Lichii&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source><translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:28pt;"&gt;fork MDias v2.0 - AMD&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation></message><message><source>Lichii is an experimental open-source emulator for the Nintendo Switch 2, based on Eglantine and Eden. &lt;br /&gt;&lt;br /&gt;This software should not be used to play games you have not legally obtained.</source><translation>fork MDias v2.0 - AMD é um emulador experimental de código aberto para Nintendo Switch e Switch 2, otimizado para placas AMD Radeon. &lt;br /&gt;&lt;br /&gt;Este software não deve ser utilizado para jogar jogos que não tenham sido obtidos legalmente.</translation></message><message><source>Eden is an experimental open-source emulator for the Nintendo Switch licensed under GPLv3.0+ which is based on the yuzu emulator which ended development back in March 2024. &lt;br /&gt;&lt;br /&gt;This software should not be used to play games you have not legally obtained.</source><translation>fork MDias v2.0 - AMD é um emulador experimental de código aberto para Nintendo Switch e Switch 2, otimizado para placas AMD Radeon. &lt;br /&gt;&lt;br /&gt;Este software não deve ser utilizado para jogar jogos que não tenham sido obtidos legalmente.</translation></message><message><source>&amp;quot;Nintendo Switch&amp;quot; is a trademark of Nintendo. Lichii is not affiliated with Nintendo in any way.</source><translation>&amp;quot;Nintendo Switch&amp;quot; é uma marca registrada da Nintendo. fork MDias v2.0 - AMD não possui afiliação com a Nintendo.</translation></message><message><source>&amp;quot;Nintendo Switch&amp;quot; is a trademark of Nintendo. Eden is not affiliated with Nintendo in any way.</source><translation>&amp;quot;Nintendo Switch&amp;quot; é uma marca registrada da Nintendo. fork MDias v2.0 - AMD não possui afiliação com a Nintendo.</translation></message><message><source>&lt;html&gt;&lt;body&gt;&lt;p&gt;&lt;a href="https://github.com/zortos293/Eglantine"&gt;Source Code&lt;/a&gt; | &lt;a href="https://github.com/zortos293/Eglantine/issues"&gt;Report an Issue&lt;/a&gt; | &lt;a href="https://github.com/zortos293/Eglantine#credits-and-license"&gt;Credits and License&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source><translation>&lt;html&gt;&lt;body&gt;&lt;p&gt;fork MDias v2.0 - AMD | Todos os direitos aos projetos originais&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation></message></context>
 <context>
     <name>CalibrationConfigurationDialog</name>
     <message>
@@ -2847,7 +2847,7 @@ Ao ativar, ignora esses avisos e encerra diretamente a emulação.</translation>
     <message>
         <location filename="../../src/yuzu/configuration/configure.ui" line="20" />
         <source>Eden Configuration</source>
-        <translation>Configurar Eden</translation>
+        <translation>Configuração do fork MDias v2.0 - AMD</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/configuration/configure.ui" line="67" />
@@ -2940,7 +2940,7 @@ Ao ativar, ignora esses avisos e encerra diretamente a emulação.</translation>
         <source>Web</source>
         <translation>Rede</translation>
     </message>
-</context>
+<message><source>Lichii Configuration</source><translation>Configuração do fork MDias v2.0 - AMD</translation></message></context>
 <context>
     <name>ConfigureFilesystem</name>
     <message>
@@ -3211,7 +3211,7 @@ Gostaria de deletar o salvamento antigo?</translation>
     <message>
         <location filename="../../src/yuzu/configuration/configure_general.cpp" line="101" />
         <source>Eden</source>
-        <translation>Eden</translation>
+        <translation>fork MDias v2.0 - AMD</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/configuration/configure_general.cpp" line="102" />
@@ -3233,7 +3233,7 @@ Gostaria de deletar o salvamento antigo?</translation>
         <source>This directory is already in the list.</source>
         <translation>Diretório já presente na lista.</translation>
     </message>
-</context>
+<message><source>Lichii</source><translation>fork MDias v2.0 - AMD</translation></message></context>
 <context>
     <name>ConfigureGraphics</name>
     <message>
@@ -5783,7 +5783,7 @@ Arrasta os pontos para mudar a posição, ou dá duplo-clique nas células da ta
     <message>
         <location filename="../../src/yuzu/configuration/configure_web.ui" line="25" />
         <source>Eden Web Service</source>
-        <translation>Serviço Web do Eden</translation>
+        <translation>Serviço Web</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/configuration/configure_web.ui" line="33" />
@@ -5834,7 +5834,7 @@ Arrasta os pontos para mudar a posição, ou dá duplo-clique nas células da ta
         <comment>Tooltip</comment>
         <translation>Deve ser em 48 caracteres, e letras minúsculas de a-z</translation>
     </message>
-</context>
+<message><source>Lichii Web Service</source><translation>Serviço Web</translation></message></context>
 <context>
     <name>ControllerDialog</name>
     <message>
@@ -6449,8 +6449,7 @@ Por favor vá para Configuração -&gt; Sistema -&gt; Rede e selecione.</transla
     <message numerus="yes">
         <location filename="../../src/yuzu/game/search_field.cpp" line="67" />
         <source>%1 of %n result(s)</source>
-        <translation><numerusform>%1 de %n resultado</numerusform><numerusform>%1 de %n resultados</numerusform><numerusform>%1 de %n resultados</numerusform></translation>
-    </message>
+        <translation><numerusform>%1 de %n resultado</numerusform><numerusform>%1 de %n resultados</numerusform></translation></message>
     <message>
         <location filename="../../src/yuzu/game/search_field.cpp" line="122" />
         <source>Filter:</source>
@@ -6925,7 +6924,7 @@ Mensagem de Depuração: </translation>
     <message>
         <location filename="../../src/yuzu/main.ui" line="62" />
         <source>Open &amp;Eden Folders</source>
-        <translation>Abrir Pastas do &amp;Eden</translation>
+        <translation>Abrir Pastas do &amp;MDias</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/main.ui" line="85" />
@@ -7066,7 +7065,7 @@ Mensagem de Depuração: </translation>
     <message>
         <location filename="../../src/yuzu/main.ui" line="295" />
         <source>&amp;About Eden</source>
-        <translation>&amp;Sobre o Eden</translation>
+        <translation>&amp;Sobre o fork MDias v2.0 - AMD</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/main.ui" line="303" />
@@ -7278,7 +7277,7 @@ Mensagem de Depuração: </translation>
     <message>
         <location filename="../../src/yuzu/main.ui" line="558" />
         <source>&amp;Eden Dependencies</source>
-        <translation>&amp;Dependências do Eden</translation>
+        <translation>&amp;Dependências</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/main.ui" line="563" />
@@ -7705,8 +7704,7 @@ Mensagem de Depuração: </translation>
     <message numerus="yes">
         <location filename="../../src/yuzu/main_window.cpp" line="2852" />
         <source>%n file(s) remaining</source>
-        <translation><numerusform>%n arquivo restante</numerusform><numerusform>%n arquivos restantes</numerusform><numerusform>%n arquivos restantes</numerusform></translation>
-    </message>
+        <translation><numerusform>%n arquivo restante</numerusform><numerusform>%n arquivos restantes</numerusform></translation></message>
     <message>
         <location filename="../../src/yuzu/main_window.cpp" line="2854" />
         <source>Installing file "%1"...</source>
@@ -7729,29 +7727,23 @@ Por favor, utilize este recurso apenas para instalar atualizações e DLCs.</tra
         <location filename="../../src/yuzu/main_window.cpp" line="2915" />
         <source>%n file(s) were newly installed
 </source>
-        <translation><numerusform>%n arquivo foi instalado recentemente
-</numerusform><numerusform>%n arquivos foram instalados recentemente
-</numerusform><numerusform>%n arquivos foram instalados recentemente
-</numerusform></translation>
-    </message>
+        <translation><numerusform>%n arquivo foi recém-instalado
+</numerusform><numerusform>%n arquivos foram recém-instalados
+</numerusform></translation></message>
     <message numerus="yes">
         <location filename="../../src/yuzu/main_window.cpp" line="2918" />
         <source>%n file(s) were overwritten
 </source>
         <translation><numerusform>%n arquivo foi sobrescrito
 </numerusform><numerusform>%n arquivos foram sobrescritos
-</numerusform><numerusform>%n arquivos foram sobrescritos
-</numerusform></translation>
-    </message>
+</numerusform></translation></message>
     <message numerus="yes">
         <location filename="../../src/yuzu/main_window.cpp" line="2920" />
         <source>%n file(s) failed to install
 </source>
         <translation><numerusform>Falha ao instalar %n arquivo
 </numerusform><numerusform>Falha ao instalar %n arquivos
-</numerusform><numerusform>Falha ao instalar %n arquivos
-</numerusform></translation>
-    </message>
+</numerusform></translation></message>
     <message>
         <location filename="../../src/yuzu/main_window.cpp" line="2930" />
         <source>System Application</source>
@@ -8000,8 +7992,7 @@ Por favor, utilize este recurso apenas para instalar atualizações e DLCs.</tra
     <message numerus="yes">
         <location filename="../../src/yuzu/main_window.cpp" line="4182" />
         <source>Building: %n shader(s)</source>
-        <translation><numerusform>Compilando: %n shader</numerusform><numerusform>Compilando: %n shaders</numerusform><numerusform>Compilando: %n shaders</numerusform></translation>
-    </message>
+        <translation><numerusform>Compilando: %n shader</numerusform><numerusform>Compilando: %n shaders</numerusform></translation></message>
     <message>
         <location filename="../../src/yuzu/main_window.cpp" line="4191" />
         <source>Scale: %1x</source>
@@ -8133,14 +8124,14 @@ Deseja forçar o X11 para inicializações futuras?</translation>
     <message>
         <location filename="../../src/yuzu/main_window.cpp" line="4519" />
         <source>Are you sure you want to close Eden?</source>
-        <translation>Tem certeza de que deseja fechar o Eglantine-NX 2 Fork MDias?</translation>
+        <translation>Tem certeza de que deseja fechar o fork MDias?</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/main_window.cpp" line="4520" />
         <location filename="../../src/yuzu/main_window.cpp" line="4608" />
         <location filename="../../src/yuzu/main_window.cpp" line="4620" />
         <source>Eden</source>
-        <translation>Eglantine-NX 2 Fork MDias</translation>
+        <translation>fork MDias v2.0 - AMD</translation>
     </message>
     <message>
         <location filename="../../src/yuzu/main_window.cpp" line="4609" />
@@ -8152,9 +8143,9 @@ Deseja forçar o X11 para inicializações futuras?</translation>
         <source>The currently running application has requested Eden to not exit.
 
 Would you like to bypass this and exit anyway?</source>
-        <translation>O aplicativo em execução solicitou que o emulador não feche.
+        <translation>O jogo em execução solicitou que o fork MDias não feche.
 
-Deseja ignorar este pedido e sair mesmo assim?</translation>
+Deseja forçar a saída mesmo assim?</translation>
     </message>
     <message>
         <location filename="../../src/qt_common/config/shared_translation.h" line="32" />
@@ -8286,7 +8277,11 @@ Deseja ignorar este pedido e sair mesmo assim?</translation>
         <source>Null</source>
         <translation>Nulo (Null)</translation>
     </message>
-</context>
+<message><source>&amp;About Lichii</source><translation>&amp;Sobre o fork MDias v2.0 - AMD</translation></message><message><source>Open &amp;Lichii Folders</source><translation>Abrir Pastas do &amp;MDias</translation></message><message><source>&amp;Lichii Dependencies</source><translation>&amp;Dependências</translation></message><message><source>Exit Lichii</source><translation>Sair do fork MDias</translation></message><message><source>Exit Eden</source><translation>Sair do fork MDias</translation></message><message><source>Are you sure you want to close Lichii?</source><translation>Tem certeza de que deseja fechar o fork MDias?</translation></message><message><source>The currently running application has requested Lichii to not exit.
+
+Would you like to bypass this and exit anyway?</source><translation>O jogo em execução solicitou que o fork MDias não feche.
+
+Deseja forçar a saída mesmo assim?</translation></message><message><source>Lichii</source><translation>fork MDias v2.0 - AMD</translation></message></context>
 <context>
     <name>MigrationWorker</name>
     <message>

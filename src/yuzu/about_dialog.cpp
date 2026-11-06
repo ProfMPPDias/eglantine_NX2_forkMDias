@@ -17,7 +17,7 @@ AboutDialog::AboutDialog(QWidget* parent)
         fmt::format("{} | {} | {}", std::string{Common::g_build_name},
                     std::string{Common::g_build_version}, std::string{Common::g_compiler_id});
 
-    const auto yuzu_build_version = std::string{"Eglantine-NX 2 Fork MDias v1.0 [test]"};
+    const auto yuzu_build_version = std::string{"fork MDias v2.0 - AMD"};
 
     ui->setupUi(this);
     // Try and request the icon from Qt theme (Linux?)
