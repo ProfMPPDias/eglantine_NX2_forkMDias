@@ -1,130 +1,112 @@
-<!--
-# SPDX-FileCopyrightText: Copyright 2026 Marcos Dias (MDias)
-# SPDX-License-Identifier: GPL-3.0-or-later
--->
+# <p align="center"><img src="imgs/lichii_icon_with_logo.png" alt="Lichii Logo" width="600"></p>
+
+<h1 align="center">Lichii - Fork MDias v4 (AMD Radeon Edition)</h1>
 
 <p align="center">
-  <img src="imgs/lichii_icon_with_logo.png" alt="Lichii fork MDias v3" width="600">
+  <b>Compilação especializada de alta performance para GPUs AMD Radeon, com foco especial em <i>The Legend of Zelda: Ocarina of Time</i> e emulação avançada de Nintendo Switch 2.</b>
 </p>
-
-# Lichii — fork MDias v3 (AMD Edition)
-
-O **Lichii fork MDias v3** é uma versão experimental e de alta performance do emulador de Nintendo Switch e Switch 2, desenvolvida por **Marcos Dias (MDias)**. Esta versão traz como grande diferencial a **tradução completa da interface para Português Brasileiro (PT-BR)**, renderizador Vulkan altamente otimizado para placas de vídeo **AMD Radeon**, mitigação de stuttering de compilação de shaders e correções visuais e de estabilidade para títulos como *The Legend of Zelda: Ocarina of Time* e outros jogos de Switch 2.
-
----
-
-## 💻 Especificações da Máquina de Testes e Validação
-
-Todas as otimizações, calibrações de cores, taxas de quadros e perfis de shaders da versão **fork MDias v3** foram desenvolvidos e validados no seguinte hardware:
-
-- **Placa-Mãe:** B550M AORUS ELITE
-- **Placa de Vídeo:** Gigabyte AMD Radeon RX 9060 XT 16 GB
-- **Memória RAM:** 16 GB DDR4 HyperX Fury
-- **Armazenamento:** NVME 1 TB
-
----
-
-## ⚙️ Configurações Sugeridas
-
-Para obter o melhor equilíbrio entre estabilidade, fidelidade gráfica e taxa de quadros (FPS) em placas AMD Radeon, utilize as configurações recomendadas a seguir.
-
-### 1. Sistema (System)
 
 <p align="center">
-  <img src="imgs/1.png" alt="Configurações de Sistema - Lichii fork MDias v3" width="750">
+  <img src="https://img.shields.io/badge/Versão-v4%20(Fork%20MDias)-blue.svg" alt="Versão v4">
+  <img src="https://img.shields.io/badge/Interface-100%25%20PT--BR-green.svg" alt="100% PT-BR">
+  <img src="https://img.shields.io/badge/Renderizador-Vulkan%20AMD%20Optimized-orange.svg" alt="Vulkan">
+  <img src="https://img.shields.io/badge/Licen%C3%A7a-GPL--3.0--or--later-red.svg" alt="GPL-3.0">
 </p>
-
-- **CPU Clocks:** `Overclock` — Remove limitadores artificiais de FPS impostos por alguns títulos.
-- **GPU Clocks:** `Overclock` — Mantém a GPU em alta fidelidade evitando que o jogo reduza render distance dinamicamente.
-- **Language / Idioma:** `Portuguese (português)` — Idioma do sistema emulado em Português.
-- **Region / Região:** `USA`
-- **Time Zone / Fuso Horário:** `Auto (Etc/GMT+3)` — Horário de Brasília / Brasil.
-- **Device Name:** `Switch de Marcos`
-- **Memory Layout (Core):** `12GB DRAM (Unsafe)` — Expande a memória disponível para emulação de jogos pesados e Switch 2.
-- **Limit Speed Percent:** `100%` (Desmarcado para liberar taxa de quadros ou marcado para trava em velocidade nativa).
-- **Turbo Speed:** `200%` / **Slow Speed:** `50%`.
 
 ---
 
-### 2. Gráficos (Graphics)
+## 🌟 Sobre o Projeto
+
+Esta é uma compilação personalizada de alto desempenho desenvolvida por **Marcos Dias (MDias)**, baseada no trabalho de *sharkiix* e *chuppatricky*. O projeto traz otimizações profundas no renderizador **Vulkan**, suporte integral e nativo em **Português Brasileiro (PT-BR)**, e gerenciamento refinado de shaders e memória de textura para arquiteturas **AMD RDNA 2, RDNA 3 e RDNA 4** (séries RX 6000, 7000 e 9000).
+
+---
+
+## 🚀 Principais Recursos e Novidades da Versão v4
+
+### 1. Interface 100% em Português Brasileiro (PT-BR)
+- Menus (**Arquivo**, **Emulação**, **Exibir**, **Ferramentas**, **Ajuda**), janelas de configurações, caixas de diálogo, notificações e atalhos traduzidos nativamente.
+- O menu **Ajuda > Sobre Lichii** exibe agora a identificação oficial do **Fork MDias v4**, com informações detalhadas da compilação e créditos aos projetos base.
+
+### 2. Cache de Shaders Compartilhado (Shared Shader Cache)
+- Se outro jogador disponibilizar seu cache compilado, você não precisará mais compilar os mesmos shaders do zero, eliminando micro-travamentos (*stutters*) ao explorar novos cenários e masmorras.
+- O arquivo pode ser nomeado (ex: `vulkan-amigo.bin`), desde que inicie com `vulkan` e termine com `.bin`.
+- Basta posicioná-lo na pasta de cache de shaders do jogo em `%APPDATA%\eden\cache\shader\0400486024dec000\`. No boot, o emulador mescla os shaders automaticamente ao seu cache permanente.
+
+### 3. Opção de Bloqueio em 30 FPS Perfeito
+- Suporte a trava estável em 30 FPS via flag `EDEN_NX2_SWAP_INTERVAL=2` no arquivo `nx2_switches.txt`, ideal para taxas de quadros 100% homogêneas e ritmo consistente.
+
+### 4. Dynamic FPS Nativo Integrado
+- Patch de FPS dinâmico incorporado diretamente ao núcleo do emulador, eliminando a necessidade de mods externos. A velocidade do jogo permanece correta mesmo com oscilação na taxa de quadros.
+
+### 5. Renderização e Otimização para GPUs AMD Radeon
+- **Emulação Acelerada de Tensores:** Ganhos expressivos na taxa de quadros (telas de título subindo de ~15 para 50-60 FPS).
+- **Correção Visual de Névoa e Iluminação:** Tratamento calibrado de neblina e luz, eliminando a película translúcida excessiva e o tom azulado/esverdeado das versões anteriores.
+- **Cache de Texturas para Placas de 12 GB+:** Ganho expressivo de fluidez em locais densos (ex: Kokiri Village em GPUs como RX 9060 XT 16 GB saltando de 35 para mais de 43 FPS sem perda de qualidade).
+- **Proteção Ativa Contra Queda de Driver ("Device loss occurred"):** Resolução de loops de shaders complexos na inicialização de gameplay nas GPUs RX 9070 XT, RX 9060 XT e RX 7800 XT.
+
+---
+
+## 🖼️ Capturas de Tela
 
 <p align="center">
-  <img src="imgs/2.png" alt="Configurações Gráficas - Lichii fork MDias v3" width="750">
+  <img src="imgs/1.png" width="48%" alt="Gameplay 1" />
+  <img src="imgs/2.png" width="48%" alt="Gameplay 2" />
 </p>
-
-- **API:** `Vulkan` (Essencial para desempenho ideal e estabilidade em drivers AMD).
-- **Dispositivo (Device):** `AMD Radeon RX 9060 XT (AMD)`
-- **Resolução:** `1X (720p/1080p)`
-- **Modo VSync:** `FIFO Relaxed` (Elimina tearing mantendo frametimes homogêneos).
-- **Filtro de Adaptação de Janela:** `Nearest Neighbor`
-- **Nitidez RCAS:** `88%` (Proporciona nitidez cristalina sem artefatos visuais).
-- **Proporção de Tela (Aspect Ratio):** `Padrão (16:9)`
-- **Método Anti-Aliasing:** `FXAA`
-- **Modo Tela Cheia:** `Borderless Windowed` (Janela Sem Bordas)
-- **Cor de Fundo:** Preto
-
----
-
-### 3. Gráficos Avançados (Advanced Graphics)
-
 <p align="center">
-  <img src="imgs/3.png" alt="Configurações Gráficas Avançadas - Lichii fork MDias v3" width="750">
+  <img src="imgs/3.png" width="48%" alt="Configurações 1" />
+  <img src="imgs/4.png" width="48%" alt="Configurações 2" />
 </p>
 
-- **Modo da GPU (GPU Mode):** `Fast` (Rápido)
-- **Precisão de DMA (DMA Accuracy):** `Unsafe (fast)` — Reduz a latência de transferência de texturas na GPU.
-- **Comportamento de Fence da GPU:** `Default`
-- **Modo de Uso de VRAM:** `Conservative`
-- **Emulação NVDEC:** `GPU Video Decoding (Default)` — Decodificação de vídeos via aceleração gráfica.
-- **Filtro Anisotrópico:** `Automatic`
-- **Método de Decodificação ASTC:** `GPU` (Decodificação direta pelos Compute Units da Radeon).
-- **Frame Pacing Mode (Vulkan):** `Auto`
-- **Método de Recompressão ASTC:** `BC3 (Medium quality)` — Economiza VRAM sem perda perceptível de qualidade.
-- **Caches de Pipeline:** Ativados para persistência contínua entre sessões.
+---
+
+## ⚙️ Configurações Recomendadas no `nx2_switches.txt`
+
+O arquivo `nx2_switches.txt` acompanha o executável e aceita as seguintes diretivas principais:
+
+```ini
+# Descarrega comandos/macros de GPU para thread secundária (+54% FPS)
+EDEN_NX2_SPLIT=2
+
+# Agrupamento de cercas de sincronização da GPU (redução de overhead no driver)
+EDEN_NX2_FENCE_BATCH=1
+
+# Correção visual de neblina para Ocarina of Time (reduced, on, off ou original)
+EDEN_NX2_OOT_FOG=reduced
+
+# Pré-compilação antecipada de pipelines de shaders no boot
+EDEN_NX2_PRELOAD_ALL_PIPELINES=1
+
+# Opcional: Trava em 30 FPS estável (descomente removendo o # se desejar)
+#EDEN_NX2_SWAP_INTERVAL=2
+```
 
 ---
 
-### 4. Extras e Hacks de Gráficos (Extras)
+## 📁 Estrutura de Pastas
 
-<p align="center">
-  <img src="imgs/4.png" alt="Configurações Extras e Hacks - Lichii fork MDias v3" width="750">
-</p>
-
-- **Hacks:**
-  - `GPU Unswizzle Max Texture Size`: `Large (256 MB)`
-  - `GPU Unswizzle Stream Size`: `Medium (32 MB)`
-  - `GPU Unswizzle Chunk Size`: `Medium (256)`
-- **Extensões Vulkan:**
-  - `Extended Dynamic State`: `ExtendedDynamicState 2`
-  - `Sample Shading`: `0%`
-
----
-
-## 🚀 Como Executar o Emulador
-
-1. Acesse a pasta do executável compilado: `Emulador/` (ou `C:\Users\mppdi\Desktop\Emulador`).
-2. Execute o aplicativo principal **`lichii.exe`**.
-3. O emulador iniciará automaticamente em **Português Brasileiro (PT-BR)** com a identificação **fork MDias v3**.
-4. Para ajustes finos de desempenho em jogos específicos (como névoa, batches de fences e pre-load de pipelines), consulte ou edite o arquivo **`nx2_switches.txt`** na mesma pasta do executável.
-
-> [!TIP]
-> No arquivo `nx2_switches.txt`, os parâmetros `EDEN_NX2_SPLIT=2`, `EDEN_NX2_FENCE_BATCH=1` e `EDEN_NX2_OOT_FOG=reduced` já vêm pré-configurados para a melhor experiência na RX 9060 XT.
+```
+├── Emulador/                      # Diretório de distribuição do emulador pronto para uso
+│   ├── lichii.exe                 # Executável do emulador (Fork MDias v4, PT-BR)
+│   ├── dxcompiler.dll             # Compilador DirectX / HLSL para Vulkan
+│   ├── dxil.dll                   # Biblioteca auxiliar de validação DXIL
+│   ├── nx2_switches.txt           # Ajustes de performance e compatibilidade
+│   ├── LEIA-ME.txt                # Instruções rápidas de uso em português
+│   └── languages/                 # Módulos de tradução compilados
+│       ├── pt_BR.qm               # Tradução ativa em Português Brasileiro
+│       └── en.qm, default.qm...   # Cópias de segurança para garantia de idioma
+├── Projeto/                       # Código-fonte completo e recursos do projeto
+│   ├── src/                       # Código-fonte em C++
+│   ├── dist/                      # Arquivos de distribuição, temas e traduções
+│   ├── imgs/                      # Logo oficial e capturas de tela
+│   ├── CMakeLists.txt             # Script de compilação CMake
+│   ├── MDIAS.md                   # Registro de alterações e notas do Fork MDias
+│   └── README.md                  # Documentação principal do projeto
+```
 
 ---
 
-## 🌟 Principais Recursos do Fork MDias v3
+## ⚖️ Licença e Avisos Legais
 
-- **Interface Totalmente em Português Brasileiro (PT-BR):** Menus, caixas de diálogo, ferramentas, atalhos e avisos traduzidos.
-- **Patch de Dynamic FPS Integrado:** O emulador gerencia a taxa de quadros e o tempo de jogo dinamicamente, mantendo a física normal sem necessidade de mods externos.
-- **Cache de Shaders Persistente:** Preservação de pipelines gráficos entre sessões, eliminando engasgos ao explorar novas áreas.
-- **Otimização de Tensores e Shaders em AMD:** Melhora substancial de fluidez na renderização Vulkan.
-- **Correção Visual de Neblina e Cores:** Eliminação da névoa excessiva e ajuste de iluminação em jogos de Switch 2.
-- **Estabilidade Reforçada:** Prevenção de perda de dispositivo Vulkan ("Device loss occurred") em placas Radeon.
+Distribuído sob a licença **GPL-3.0-or-later**. O código-fonte integral está incluído neste repositório.
 
----
-
-## 📜 Licença e Créditos
-
-Este projeto é desenvolvido e mantido por **Marcos Dias (MDias)** como um fork independente, livre e de código aberto sob a licença **GPL-3.0-or-later**. Preserva e respeita o histórico de contribuições dos projetos de emulação de código aberto upstream (Eglantine, Eden, yuzu, Sudachi).
-
-O código-fonte completo está disponível na pasta do projeto.
+> **Aviso:** Nintendo Switch e Nintendo Switch 2 são marcas registradas da Nintendo Co., Ltd. Este projeto é de código aberto para fins educacionais e de pesquisa e não possui vínculo com a Nintendo.

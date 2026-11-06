@@ -1,0 +1,1018 @@
+diff --git a/dist/release_name.txt b/dist/release_name.txt
+index e17e7cf0ea..bf9271df13 100644
+--- a/dist/release_name.txt
++++ b/dist/release_name.txt
+@@ -1 +1 @@
+-chuppatricky-amd-testbuild v13
++sharkiix version 3.0 EXPERIMENTAL
+diff --git a/dist/sharkiix/nx2_switches.txt b/dist/sharkiix/nx2_switches.txt
+new file mode 100644
+index 0000000000..77befd5d33
+--- /dev/null
++++ b/dist/sharkiix/nx2_switches.txt
+@@ -0,0 +1,81 @@
++# Switch NX2 - read when the Lichii GUI starts.
++# One NAME=VALUE per line. Lines starting with # are ignored.
++# A variable already set in the environment wins over this file.
++# Between files, the user copy (%APPDATA%\eden\nx2_switches.txt, or
++# $XDG_CONFIG_HOME/eden/nx2_switches.txt) wins over this one, so editing this file is never
++# needed: copy the lines you want into your own and restart.
++#
++# Restart the emulator after editing.
++
++# --- Performance tuning defaults for Switch 2 ---
++# Offload GPU method/macro execution to the back thread (SPLIT=2 delivers up to +54% FPS alone).
++EDEN_NX2_SPLIT=2
++
++# Batch GPU fence syncpoints to reduce host driver overhead and smooth frametimes.
++EDEN_NX2_FENCE_BATCH=1
++
++# Leave buffer downloads disabled on Switch 2 (default): forcing downloads (=1) copies back
++# 90-220 MB/s of buffers CPU never touches, causing heavy mutex contention and dropping FPS by ~38-63%.
++#EDEN_NX2_BUFFER_DOWNLOADS=1
++
++# Paces frame submission 2 frames ahead. Reduces frametime spikes, but adds ~1-2 frames of input latency.
++# Enable only if frame pacing stability is preferred over responsive controls.
++#EDEN_NX2_FRAMES_AHEAD=2
++
++# --- Workarounds / Debug ---
++# Terrain/indirect drawing fix for Donkey Kong Bananza: enabled by default. Set to 0 only to leave to GPU.
++#EDEN_NX2_RESETFIX=0
++
++# Drop reactive-flushing read traps on Switch 2 programs (opt-in; can reduce FPS from 29 to 24 in MKW).
++#EDEN_NX2_NO_REACTIVE=1
++
++#EDEN_NX2_MME_JIT=0
++#EDEN_NX2_PBFLUSH=0
++#EDEN_NX2_SKIP_SAME=0
++#EDEN_NX2_INLINE_DEFER=0
++#EDEN_NX2_SPLIT_SKIP=1
++#EDEN_NX2_AUTO_STUB=1
++#EDEN_NX2_KEEP_ASTC=1
++
++# --- chuppatricky-amd-testbuild (Ocarina of Time on AMD) ---
++# Ocarina of Time fog: reduced, on, off or original. Change the value below, or put the line in your own
++# %APPDATA%\eden\nx2_switches.txt (it wins over this file) and restart.
++#   reduced: the outdoor haze thinned to 1/4 and the final exposure lowered to 0.65 (closer to the
++#            console; the default here)
++#   on:      the game's full fog as this emulator draws it (thicker than on the console),
++#            exposure 0.65
++#   off:     no fog at all, exposure 0.65
++#   original: no changes at all: full fog and the emulator's brighter image
++# Older builds' EDEN_NX2_OOT_VISUAL_WORKAROUND=0 now means "original".
++EDEN_NX2_OOT_FOG=reduced
++
++# Builds every cached shader pipeline at boot instead of when first needed. Ocarina's cache is a few
++# hundred pipelines, so boot takes a little longer and areas you've visited before stop stuttering.
++# To turn it off: EDEN_NX2_PRELOAD_ALL_PIPELINES=0
++EDEN_NX2_PRELOAD_ALL_PIPELINES=1
++
++# Diagnostic: logs each shader compile as it starts and finishes, so a log from a PC that freezes
++# shows the shader the graphics driver hangs on. Adds a few hundred lines to the log.
++EDEN_NX2_LOG_PIPELINE_COMPILES=1
++
++# Radeon RX 5000/6000 on Windows (AMD driver older than 2.0.388): the largest compute shaders are
++# built without driver optimizations, since that driver froze compiling one of them at the title
++# screen. Automatic; EDEN_NX2_AMD_SAFE_COMPILE=0 turns it off, =1 forces it on any AMD driver.
++# EDEN_NX2_AMD_SAFE_COMPILE_MIN_KIB=0 applies it to every compute shader if the freeze remains.
++
++# Radeon on Windows: if the game closes by itself with no error around the Deku Tree (the log just
++# stops), remove the "# " in front of the next line. Experimental: graphics shaders are then built
++# without driver optimizations too, which may cost some speed.
++# EDEN_NX2_AMD_SAFE_COMPILE_GRAPHICS=1
++
++# "Device loss occurred" soon after gameplay starts (RX 9070 XT, 9060 XT, 7800 XT): v13 fixes the
++# shader loop that hung the GPU. If it still happens, first remove the "# " in front of the next
++# line and send the log: it records which shaders the GPU was running when it hung.
++# EDEN_NX2_GPU_BREADCRUMBS=1
++# Last resort: remove the "# " in front of the next line. It skips the six fog, lighting and
++# vegetation compute shaders the Max Resolution mode added: less fog, light and grass.
++# EDEN_NX2_REJECT_HASH=0051f3226c2ac35e,7ca59d64e659a9e1,9a24d120a5fa2a93,affbb36232fcda8f,e311d97dbe057ad3,394cb954427f6336
++
++# --- sharkiix v3 ---
++# Verrouillage a 30 images/s (rythme parfaitement regulier). Enlevez le # pour l'activer.
++#EDEN_NX2_SWAP_INTERVAL=2
+diff --git a/src/common/nx2_sample_profile.cpp b/src/common/nx2_sample_profile.cpp
+index 4e0a2463cc..94c7922e88 100644
+--- a/src/common/nx2_sample_profile.cpp
++++ b/src/common/nx2_sample_profile.cpp
+@@ -1,6 +1,8 @@
+ // SPDX-FileCopyrightText: Copyright 2026 Eden Emulator Project
+ // SPDX-License-Identifier: GPL-3.0-or-later
+ 
++#include <cstring>
++#include <cstdlib>
+ #include <cstdlib>
+ #include <string>
+ #include <string_view>
+@@ -84,8 +86,11 @@ constexpr size_t MaxDepth = 32;
+ struct SampledThread {
+     HANDLE handle{};
+     std::string name;
++    int core{-1};
+ };
+ 
++std::array<std::atomic<std::uint8_t>, 16> guest_threads{};
++
+ std::mutex threads_mutex;
+ std::array<SampledThread, MaxThreads> sampled_threads;
+ std::atomic<size_t> num_threads{};
+@@ -216,7 +221,9 @@ void SamplerMain() {
+             Put(file, KindSample);
+             Put(file, static_cast<std::uint8_t>(index));
+             Put(file, static_cast<std::uint8_t>(depth));
+-            Put(file, static_cast<std::uint8_t>(0));
++            const int core = sampled_threads[index].core;
++            Put(file, core >= 0 ? guest_threads[core].load(std::memory_order_relaxed)
++                                : static_cast<std::uint8_t>(0));
+             Put(file, static_cast<std::uint64_t>(now.QuadPart));
+             file.write(reinterpret_cast<const char*>(frames.data()),
+                        static_cast<std::streamsize>(depth * sizeof(std::uint64_t)));
+@@ -265,7 +272,11 @@ void OnThreadNamed(const char* name) {
+             CloseHandle(handle);
+             return;
+         }
+-        sampled_threads[index] = {handle, name};
++        int core = -1;
++        if (std::strncmp(name, "CPUCore_", 8) == 0) {
++            core = std::atoi(name + 8);
++        }
++        sampled_threads[index] = {handle, name, core};
+         num_threads.store(index + 1, std::memory_order_release);
+     }
+     static std::once_flag started;
+@@ -273,4 +284,12 @@ void OnThreadNamed(const char* name) {
+ #endif
+ }
+ 
++void SetGuestThread(unsigned core, unsigned long long thread_id) {
++#ifdef _WIN32
++    if (core < guest_threads.size()) {
++        guest_threads[core].store(static_cast<std::uint8_t>(thread_id), std::memory_order_relaxed);
++    }
++#endif
++}
++
+ } // namespace Common::Nx2SampleProfile
+diff --git a/src/common/nx2_sample_profile.h b/src/common/nx2_sample_profile.h
+index 507bec9f06..2576cef0f1 100644
+--- a/src/common/nx2_sample_profile.h
++++ b/src/common/nx2_sample_profile.h
+@@ -19,4 +19,7 @@ namespace Common::Nx2SampleProfile {
+ /// the sampler with the first one.
+ void OnThreadNamed(const char* name);
+ 
++/// Guest thread id (low byte) running on each emulated core, stored with each CPUCore_N sample.
++void SetGuestThread(unsigned core, unsigned long long thread_id);
++
+ } // namespace Common::Nx2SampleProfile
+diff --git a/src/core/arm/dynarmic/arm_dynarmic_64.cpp b/src/core/arm/dynarmic/arm_dynarmic_64.cpp
+index b489e79568..68fff44a89 100644
+--- a/src/core/arm/dynarmic/arm_dynarmic_64.cpp
++++ b/src/core/arm/dynarmic/arm_dynarmic_64.cpp
+@@ -10,6 +10,11 @@
+ #include <immintrin.h>
+ #endif
+ #include "common/settings.h"
++#include <cstdio>
++#include <cstdlib>
++#include <mutex>
++#include <unordered_set>
++#include <fmt/format.h>
+ #include "core/arm/dynarmic/arm_dynarmic.h"
+ #include "core/arm/dynarmic/arm_dynarmic_64.h"
+ #include "core/arm/dynarmic/dynarmic_exclusive_monitor.h"
+@@ -61,6 +66,20 @@ std::optional<u32> DynarmicCallbacks64::MemoryReadCode(u64 vaddr) {
+     if (last_code_addr != aligned_vaddr) {
+         m_memory.ReadBlock(aligned_vaddr, &cached_code_page, sizeof(cached_code_page));
+         last_code_addr = aligned_vaddr;
++        // EDEN_NX2_CODE_DUMP=<dir>: saves each guest code page the JIT reads (analysis only).
++        static const char* const code_dump_dir = std::getenv("EDEN_NX2_CODE_DUMP");
++        if (code_dump_dir != nullptr) {
++            static std::mutex dump_mutex;
++            static std::unordered_set<u64> dumped;
++            std::scoped_lock lock{dump_mutex};
++            if (dumped.insert(aligned_vaddr).second) {
++                const std::string path = fmt::format("{}/{:016x}.bin", code_dump_dir, aligned_vaddr);
++                if (std::FILE* file = std::fopen(path.c_str(), "wb")) {
++                    std::fwrite(&cached_code_page, sizeof(cached_code_page), 1, file);
++                    std::fclose(file);
++                }
++            }
++        }
+     }
+     const u32 instruction = cached_code_page.inst[(vaddr & Core::Memory::YUZU_PAGEMASK) / sizeof(u32)];
+     if (WindowTrace::Enabled() && m_process->GetProgramId() == WindowTrace::ProgramId) {
+diff --git a/src/core/file_sys/patch_manager.cpp b/src/core/file_sys/patch_manager.cpp
+index 2fe1c657b3..f429d22f67 100644
+--- a/src/core/file_sys/patch_manager.cpp
++++ b/src/core/file_sys/patch_manager.cpp
+@@ -5,6 +5,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ 
+ #include <algorithm>
++#include <cstdlib>
+ #include <span>
+ #include <array>
+ #include <cstddef>
+@@ -94,6 +95,17 @@ constexpr std::array DYNAMIC_FPS_RECORDS{
+     BuiltinPatchRecord{.module_offset = 0x3C46200, .bytes = DYNAMIC_FPS_ROUTINE},
+ };
+ 
++// Native zstd: the two calls to ZSTD_decompressMultiFrame (main+0xEB380) become svc 0xF0 / 0xF1,
++// decompressed by the host (Kernel::Svc::Call, svc.cpp). Same output as the game's decoder.
++constexpr std::array<u8, 4> NATIVE_ZSTD_SVC_F0{0x01, 0x1E, 0x00, 0xD4}; // svc #0xf0
++constexpr std::array<u8, 4> NATIVE_ZSTD_SVC_F1{0x21, 0x1E, 0x00, 0xD4}; // svc #0xf1
++constexpr std::array NATIVE_ZSTD_RECORDS{
++    BuiltinPatchRecord{.module_offset = 0xBF72E0, .bytes = NATIVE_ZSTD_SVC_F0, .checked = true,
++                       .original = 0x97D3D028},
++    BuiltinPatchRecord{.module_offset = 0xF50164, .bytes = NATIVE_ZSTD_SVC_F1, .checked = true,
++                       .original = 0x97C66C87},
++};
++
+ constexpr std::array BUILTIN_PATCHES{
+     BuiltinPatch{
+         .name = "Max Resolution (built-in)",
+@@ -109,6 +121,13 @@ constexpr std::array BUILTIN_PATCHES{
+         .build_id = "E0F3CCFAF50065AE4EA01EB5AEB13B1A45DA3348",
+         .records = DYNAMIC_FPS_RECORDS,
+     },
++    BuiltinPatch{
++        .name = "Native zstd (built-in)",
++        .title_id = 0x0400486024DEC000,
++        .module = "main",
++        .build_id = "E0F3CCFAF50065AE4EA01EB5AEB13B1A45DA3348",
++        .records = NATIVE_ZSTD_RECORDS,
++    },
+ };
+ 
+ enum class TitleVersionFormat : u8 {
+@@ -585,6 +604,53 @@ std::vector<u8> PatchManager::PatchNSO(const std::vector<u8>& nso, const std::st
+                  patch.records.size(), name);
+     }
+ 
++    // EDEN_NX2_PROBE=<off>,<off>,... (analysis only): main's pacibsp at each offset becomes
++    // svc #0xF8+i, which counts the calls and their callers (svc.cpp) and goes on as the hint did.
++    if (const char* probe = std::getenv("EDEN_NX2_PROBE"); probe != nullptr && name == "main") {
++        u32 index = 0;
++        for (const char* p = probe; *p != 0 && index < 8;) {
++            char* end{};
++            const u64 module_offset = std::strtoull(p, &end, 16);
++            if (end == p) break;
++            const size_t offset = sizeof(Loader::NSOHeader) + module_offset;
++            u32 original{};
++            if (out.size() >= offset + 4) std::memcpy(&original, out.data() + offset, 4);
++            if (original == 0xD503237F || original == 0xD503233F) {
++                const u32 svc = 0xD4000001 | ((0xF8 + index) << 5);
++                std::memcpy(out.data() + offset, &svc, 4);
++                LOG_INFO(Loader, "    - Probe {} at main+{:#x}", index, module_offset);
++            } else {
++                LOG_WARNING(Loader, "    - Probe {} at main+{:#x}: not a pacibsp ({:#010x})", index,
++                            module_offset, original);
++            }
++            ++index;
++            p = *end == ',' ? end + 1 : end;
++        }
++        // Return trampoline (svc #0xF7) in the unused space after the code, past Dynamic FPS's.
++        const size_t tramp = sizeof(Loader::NSOHeader) + 0x3C46400;
++        u32 old{};
++        if (out.size() >= tramp + 4) std::memcpy(&old, out.data() + tramp, 4);
++        if (old == 0) {
++            const u32 svc = 0xD4000001 | (0xF7 << 5);
++            std::memcpy(out.data() + tramp, &svc, 4);
++        } else {
++            LOG_WARNING(Loader, "    - Probe return trampoline: main+0x3c46400 is not free");
++        }
++    }
++
++    // EDEN_NX2_DYNFPS_LOG=1 (analysis only): Dynamic FPS's ret becomes svc #0xF6, which logs the
++    // frame step it returns (Kernel::Svc::Call) and returns.
++    if (std::getenv("EDEN_NX2_DYNFPS_LOG") != nullptr && name == "main") {
++        const size_t at = sizeof(Loader::NSOHeader) + 0x3C46270;
++        u32 old{};
++        if (out.size() >= at + 4) std::memcpy(&old, out.data() + at, 4);
++        if (old == 0xD65F03C0) {
++            const u32 svc = 0xD4000001 | (0xF6 << 5);
++            std::memcpy(out.data() + at, &svc, 4);
++            LOG_INFO(Loader, "    - Dynamic FPS log at main+0x3c46270");
++        }
++    }
++
+     if (out.size() < sizeof(Loader::NSOHeader)) {
+         return nso;
+     }
+diff --git a/src/core/hle/kernel/k_scheduler.cpp b/src/core/hle/kernel/k_scheduler.cpp
+index 3156a17064..2c8e863b82 100644
+--- a/src/core/hle/kernel/k_scheduler.cpp
++++ b/src/core/hle/kernel/k_scheduler.cpp
+@@ -17,6 +17,7 @@
+ #include "core/hle/kernel/k_interrupt_manager.h"
+ #include "core/hle/kernel/k_process.h"
+ #include "core/hle/kernel/k_scheduler.h"
++#include "common/nx2_sample_profile.h"
+ #include "core/hle/kernel/k_scoped_scheduler_lock_and_sleep.h"
+ #include "core/hle/kernel/k_thread.h"
+ #include "core/hle/kernel/kernel.h"
+@@ -335,6 +336,7 @@ void KScheduler::SwitchThread(KernelCore& kernel, KThread* next_thread) {
+     if (next_thread->GetCurrentCore() != m_core_id) {
+         next_thread->SetCurrentCore(m_core_id);
+     }
++    Common::Nx2SampleProfile::SetGuestThread(static_cast<unsigned>(m_core_id), next_thread->GetThreadId());
+ 
+     // If we're not actually switching thread, there's nothing to do.
+     if (next_thread == cur_thread) {
+diff --git a/src/core/hle/kernel/svc.cpp b/src/core/hle/kernel/svc.cpp
+index 8a1e64d81e..7dfebd3433 100644
+--- a/src/core/hle/kernel/svc.cpp
++++ b/src/core/hle/kernel/svc.cpp
+@@ -9,10 +9,22 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <type_traits>
++#include <array>
++#include <atomic>
++#include <vector>
++#include <zstd.h>
++#include <algorithm>
++#include <chrono>
++#include <mutex>
++#include <string>
++#include <unordered_map>
++#include <fmt/format.h>
+ 
+ #include "core/arm/arm_interface.h"
+ #include "core/core.h"
+ #include "core/hle/kernel/k_process.h"
++#include "core/hle/kernel/k_scoped_scheduler_lock_and_sleep.h"
++#include "core/hle/kernel/k_thread.h"
+ #include "core/hle/kernel/svc.h"
+ #include "core/hle/kernel/k_readable_event.h"
+ #include "core/hle/service/kernel_helpers.h"
+@@ -2500,6 +2512,202 @@ static void Call64(Core::System& system, u32 imm, std::span<uint64_t, 8> args) {
+     default: UNREACHABLE_MSG("Unhandled SVC {:#x}!", imm);
+     }
+ }
++// Ocarina of Time (Switch 2): the game decompresses zstd data on its main threads all the time
++// (~25-40% of their time outdoors, in ZSTD_decompressMultiFrame at main+0xEB380). The built-in
++// patch "Native zstd" turns its two one-shot calls (no dictionary; the callers reset the context
++// first and only read the output) into svc 0xF0 / 0xF1, decompressed here by the host's zstd:
++// the same format, so the same bytes. Anything unusual (a dictionary, an error, a huge buffer)
++// runs the game's own function instead. EDEN_NX2_ZSTD_NATIVE=0 always runs the game's function.
++namespace {
++constexpr u64 Nx2ZstdFunction = 0xEB380;
++constexpr std::array<u64, 2> Nx2ZstdCallSites{0xBF72E0, 0xF50164};
++
++bool Nx2ZstdNative(Core::System& system, KProcess& process, u32 imm, std::array<uint64_t, 8>& args) {
++    static const bool enabled = [] {
++        const char* value = std::getenv("EDEN_NX2_ZSTD_NATIVE");
++        return value == nullptr || value[0] != '0';
++    }();
++    const u64 dst = args[1], capacity = args[2], src = args[3], src_size = args[4];
++    if (!enabled || args[5] != 0 || args[6] != 0 || args[7] != 0 || capacity > (512ULL << 20) ||
++        src_size > (512ULL << 20)) {
++        return false;
++    }
++    auto& memory = process.GetMemory();
++    if (!memory.IsValidVirtualAddressRange(src, src_size) ||
++        !memory.IsValidVirtualAddressRange(dst, capacity)) {
++        return false;
++    }
++    thread_local std::vector<u8> input;
++    thread_local std::vector<u8> output;
++    input.resize(src_size);
++    memory.ReadBlock(src, input.data(), src_size);
++    if (output.size() < capacity) {
++        output.resize(capacity);
++    }
++    const size_t result = ZSTD_decompress(output.data(), capacity, input.data(), src_size);
++    if (ZSTD_isError(result)) {
++        static std::atomic<u32> logged{};
++        if (logged.fetch_add(1) < 16) {
++            LOG_WARNING(Kernel_SVC, "Native zstd: {} on {:#x} bytes; running the game's own decoder",
++                        ZSTD_getErrorName(result), src_size);
++        }
++        return false;
++    }
++    memory.WriteBlock(dst, output.data(), result);
++    args[0] = result;
++    static std::atomic<u64> calls{};
++    static std::atomic<u64> bytes{};
++    bytes.fetch_add(result, std::memory_order_relaxed);
++    if (const u64 n = calls.fetch_add(1, std::memory_order_relaxed) + 1; n == 1 || n % 20000 == 0) {
++        LOG_INFO(Kernel_SVC, "Native zstd (svc {:#x}): {} calls, {} MiB decompressed", imm, n,
++                 bytes.load(std::memory_order_relaxed) >> 20);
++    }
++    return true;
++}
++
++// The patched call site runs the game's function after all: call it as the bl did.
++void Nx2ZstdRunGuest(Core::System& system, KProcess& process, u32 imm) {
++    auto& kernel = system.Kernel();
++    auto* const arm = process.GetArmInterface(kernel.CurrentPhysicalCoreIndex());
++    Svc::ThreadContext ctx{};
++    arm->GetContext(ctx);
++    const u64 return_address = ctx.pc; // after the svc, where the bl returned to
++    const u64 module_base = return_address - 4 - Nx2ZstdCallSites[imm - 0xF0];
++    ctx.lr = return_address;
++    ctx.pc = module_base + Nx2ZstdFunction;
++    arm->SetContext(ctx);
++}
++struct Nx2ProbeFrame {
++    u64 lr;
++    u32 index;
++};
++std::unordered_map<u64, std::vector<Nx2ProbeFrame>>& Nx2ProbeReturns() {
++    static std::unordered_map<u64, std::vector<Nx2ProbeFrame>> stacks;
++    return stacks;
++}
++std::mutex& Nx2ProbeMutex() {
++    static std::mutex mutex;
++    return mutex;
++}
++
++void Nx2ProbeReturn(Core::System& system, KProcess& process, std::array<uint64_t, 8>& args) {
++    auto& kernel = system.Kernel();
++    auto* const arm = process.GetArmInterface(kernel.CurrentPhysicalCoreIndex());
++    Svc::ThreadContext ctx{};
++    arm->GetContext(ctx);
++    static std::array<std::unordered_map<u64, u64>, 8> results{};
++    static auto last = std::chrono::steady_clock::now();
++    std::scoped_lock lock{Nx2ProbeMutex()};
++    auto& stack = Nx2ProbeReturns()[GetCurrentThread(kernel).GetThreadId()];
++    if (stack.empty()) {
++        LOG_CRITICAL(Kernel_SVC, "Probe return with no frame");
++        return;
++    }
++    const Nx2ProbeFrame frame = stack.back();
++    stack.pop_back();
++    ++results[frame.index][args[0]];
++    ctx.pc = frame.lr;
++    arm->SetContext(ctx);
++    const auto now = std::chrono::steady_clock::now();
++    if (now - last >= std::chrono::seconds{5}) {
++        last = now;
++        for (u32 i = 0; i < 8; ++i) {
++            if (results[i].empty()) continue;
++            std::string text;
++            for (auto& [value, n] : results[i]) text += fmt::format(" {:#x}x{}", value, n);
++            LOG_INFO(Kernel_SVC, "Probe {} returned:{}", i, text.substr(0, 400));
++            results[i].clear();
++        }
++    }
++}
++
++// EDEN_NX2_PROBE (patch_manager.cpp): counts calls per probe and the most frequent callers.
++void Nx2Probe(Core::System& system, KProcess& process, u32 imm, std::array<uint64_t, 8>& args) {
++    auto& kernel = system.Kernel();
++    auto* const arm = process.GetArmInterface(kernel.CurrentPhysicalCoreIndex());
++    Svc::ThreadContext ctx{};
++    arm->GetContext(ctx);
++    static std::array<u64, 8> counts{};
++    static std::array<std::unordered_map<u64, u64>, 8> callers{};
++    static auto last = std::chrono::steady_clock::now();
++    std::scoped_lock lock{Nx2ProbeMutex()};
++    const u32 index = imm - 0xF8;
++    ++counts[index];
++    ++callers[index][ctx.lr];
++    // Return capture: the function returns to the trampoline (svc 0xF7, Nx2ProbeReturn), which
++    // records x0 and goes on at the real return address.
++    static const std::vector<u64> offsets = [] {
++        std::vector<u64> list;
++        for (const char* p = std::getenv("EDEN_NX2_PROBE"); p && *p;) {
++            char* end{};
++            list.push_back(std::strtoull(p, &end, 16));
++            if (end == p) break;
++            p = *end == ',' ? end + 1 : end;
++        }
++        return list;
++    }();
++    if (index < offsets.size()) {
++        const u64 base = ctx.pc - 4 - offsets[index];
++        Nx2ProbeReturns()[GetCurrentThread(kernel).GetThreadId()].push_back({ctx.lr, index});
++        ctx.lr = base + 0x3C46400;
++        arm->SetContext(ctx);
++    }
++    // x2 as a path: the distinct strings seen (loaders take a file name there).
++    static std::array<std::unordered_map<std::string, u64>, 8> paths{};
++    if (process.GetMemory().IsValidVirtualAddressRange(args[2], 1)) {
++        std::string text;
++        for (u64 k = 0; k < 160; ++k) {
++            const u8 c = process.GetMemory().Read8(args[2] + k);
++            if (c == 0) break;
++            text.push_back(c >= 32 && c < 127 ? static_cast<char>(c) : '?');
++        }
++        if (text.size() >= 3) ++paths[index][text];
++    }
++    // Content check: x3/x4 as (pointer, size); a hash of the first 256 bytes says whether the
++    // same input comes back (seen before in this run) or is new.
++    static std::array<std::unordered_map<u64, u64>, 8> seen{};
++    static std::array<u64, 8> repeats{};
++    static std::array<u64, 8> bytes{};
++    {
++        const u64 pointer = args[3], size = args[4];
++        if (size > 0 && size < (64ULL << 20) &&
++            process.GetMemory().IsValidVirtualAddressRange(pointer, std::min<u64>(size, 256))) {
++            std::array<u8, 256> head{};
++            const size_t n = static_cast<size_t>(std::min<u64>(size, 256));
++            process.GetMemory().ReadBlock(pointer, head.data(), n);
++            u64 hash = 1469598103934665603ULL ^ size;
++            for (size_t k = 0; k < n; ++k) hash = (hash ^ head[k]) * 1099511628211ULL;
++            if (seen[index][hash]++ > 0) ++repeats[index];
++            bytes[index] += size;
++        }
++    }
++    const auto now = std::chrono::steady_clock::now();
++    if (now - last >= std::chrono::seconds{5}) {
++        last = now;
++        for (u32 i = 0; i < 8; ++i) {
++            if (counts[i] == 0) continue;
++            std::vector<std::pair<u64, u64>> top(callers[i].begin(), callers[i].end());
++            std::sort(top.begin(), top.end(), [](auto& a, auto& b) { return a.second > b.second; });
++            std::string text;
++            for (size_t j = 0; j < std::min<size_t>(6, top.size()); ++j)
++                text += fmt::format(" {:#x}x{}", top[j].first, top[j].second);
++            LOG_INFO(Kernel_SVC, "Probe {}: {} calls in 5 s ({} with an input seen before, {} KiB in, {} distinct inputs so far), callers{}",
++                     i, counts[i], repeats[i], bytes[i] >> 10, seen[i].size(), text);
++            repeats[i] = 0;
++            bytes[i] = 0;
++            std::vector<std::pair<u64, std::string>> names;
++            for (auto& [name, n] : paths[i]) names.emplace_back(n, name);
++            std::sort(names.rbegin(), names.rend());
++            for (size_t j = 0; j < std::min<size_t>(8, names.size()); ++j)
++                LOG_INFO(Kernel_SVC, "Probe {}:   x2 \"{}\" x{}", i, names[j].second, names[j].first);
++            paths[i].clear();
++            counts[i] = 0;
++            callers[i].clear();
++        }
++    }
++}
++} // Anonymous namespace
++
+ void Call(Core::System& system, u32 imm) {
+     auto& kernel = system.Kernel();
+     auto& process = GetCurrentProcess(kernel);
+@@ -2510,6 +2718,40 @@ void Call(Core::System& system, u32 imm) {
+     LOG_TRACE(Kernel_SVC, "{} [0]={:#x} [1]={:#x} [2]={:#x} [3]={:#x} [4]={:#x} [5]={:#x} [6]={:#x}",
+         imm, GetArg64(args, 0), GetArg64(args, 1), GetArg64(args, 2),
+         GetArg64(args, 3), GetArg64(args, 4), GetArg64(args, 5), GetArg64(args, 6));
++    // Set EDEN_NX2_THREAD_STATS=1 to log, every 5 s, the guest threads by CPU time.
++    static const bool thread_stats = std::getenv("EDEN_NX2_THREAD_STATS") != nullptr;
++    if (thread_stats) {
++        static std::mutex stats_mutex;
++        static auto stats_last = std::chrono::steady_clock::now();
++        static std::unordered_map<u64, s64> stats_prev;
++        const auto now = std::chrono::steady_clock::now();
++        if (now - stats_last > std::chrono::seconds(5) && stats_mutex.try_lock()) {
++            stats_last = now;
++            struct Row { u64 id; s64 delta; s32 core; s32 prio; u64 mask; u64 entry; };
++            std::vector<Row> rows;
++            s64 total = 0;
++            {
++                KScopedSchedulerLock sl{kernel};
++                for (auto& t : process.GetThreadList()) {
++                    const s64 cpu = t.GetCpuTime();
++                    const s64 d = cpu - stats_prev[t.GetThreadId()];
++                    stats_prev[t.GetThreadId()] = cpu;
++                    total += d;
++                    rows.push_back({t.GetThreadId(), d, t.GetActiveCore(), t.GetPriority(),
++                                    t.GetAffinityMask().GetAffinityMask(), t.GetArgument()});
++                }
++            }
++            std::sort(rows.begin(), rows.end(), [](const Row& a, const Row& b) { return a.delta > b.delta; });
++            std::string text;
++            for (size_t i = 0; i < std::min<size_t>(rows.size(), 24); ++i) {
++                text += fmt::format(" | t{} {:.1f}% c{} p{} m{:x}", rows[i].id,
++                                    total ? 100.0 * rows[i].delta / total : 0.0, rows[i].core,
++                                    rows[i].prio, rows[i].mask);
++            }
++            LOG_INFO(Kernel_SVC, "Nx2ThreadStats total={} ticks{}", total, text);
++            stats_mutex.unlock();
++        }
++    }
+     // Set EDEN_NX2_SVC_TRACE=1 to log every SVC with its arguments and results, or
+     // EDEN_NX2_SVC_TRACE=<first>:<last> for presents first..last only (a frame-time profile).
+     static const std::pair<u64, u64> trace_range = [] {
+@@ -2541,7 +2783,47 @@ void Call(Core::System& system, u32 imm) {
+             LOG_INFO(Kernel_SVC, "svc 0x18 t{} waits on{}", GetCurrentThread(kernel).GetThreadId(), list);
+         }
+     }
+-    if (imm == 0x80) {
++    if (imm == 0xF6 && process.Is64Bit() && process.GetProgramId() == 0x0400486024DEC000 &&
++        std::getenv("EDEN_NX2_DYNFPS_LOG") != nullptr) {
++        auto* const arm = process.GetArmInterface(kernel.CurrentPhysicalCoreIndex());
++        Svc::ThreadContext ctx{};
++        arm->GetContext(ctx);
++        const auto f = [&](size_t i) {
++            float value;
++            const u32 bits = static_cast<u32>(ctx.v[i][0]);
++            std::memcpy(&value, &bits, sizeof(value));
++            return value;
++        };
++        static auto last = std::chrono::steady_clock::now();
++        static const auto first = std::chrono::steady_clock::now();
++        static u64 calls = 0;
++        static double game_seconds = 0.0;
++        ++calls;
++        if (f(1) > 0.0f) {
++            game_seconds += static_cast<double>(f(8)) / static_cast<double>(f(1));
++        }
++        if (const auto now = std::chrono::steady_clock::now(); now - last > std::chrono::milliseconds(500)) {
++            last = now;
++            const double real = std::chrono::duration<double>(now - first).count();
++            LOG_INFO(Kernel_SVC, "Nx2DynFps calls={} s0={} s1={} step={} smoothed_ticks={} game_s={:.2f} real_s={:.2f} behind={:.2f}",
++                     calls, f(0), f(1), f(8), ctx.r[12], game_seconds, real, real - game_seconds);
++        }
++        ctx.pc = ctx.lr;
++        arm->SetContext(ctx);
++        return;
++    }
++    if (imm == 0xF7 && process.Is64Bit() && process.GetProgramId() == 0x0400486024DEC000 &&
++        std::getenv("EDEN_NX2_PROBE") != nullptr) {
++        Nx2ProbeReturn(system, process, args);
++    } else if (imm >= 0xF8 && imm <= 0xFF && process.Is64Bit() &&
++        process.GetProgramId() == 0x0400486024DEC000 && std::getenv("EDEN_NX2_PROBE") != nullptr) {
++        Nx2Probe(system, process, imm, args);
++    } else if ((imm == 0xF0 || imm == 0xF1) && process.Is64Bit() &&
++        process.GetProgramId() == 0x0400486024DEC000) {
++        if (!Nx2ZstdNative(system, process, imm, args)) {
++            Nx2ZstdRunGuest(system, process, imm);
++        }
++    } else if (imm == 0x80) {
+         // Switch 2 only: svcSetGpuMemoryAttribute(address, size, mask, attr). nn::gpu::sdk and
+         // nn::gs native memory set the new "GPU accessible" attribute (0x20) before registering
+         // memory with the GPU and clear it on destruction; NVN can see it through QueryMemory.
+diff --git a/src/core/hle/kernel/svc/svc_info.cpp b/src/core/hle/kernel/svc/svc_info.cpp
+index bbd7d32445..08bb03e279 100644
+--- a/src/core/hle/kernel/svc/svc_info.cpp
++++ b/src/core/hle/kernel/svc/svc_info.cpp
+@@ -137,6 +137,13 @@ Result GetInfo(Core::System& system, u64* result, InfoType info_id_type, Handle
+             R_SUCCEED();
+         case InfoType::UsedNonSystemMemorySize:
+             *result = process->GetUsedNonSystemUserPhysicalMemorySize(system.Kernel());
++            if (std::getenv("EDEN_NX2_MEMINFO_LOG")) {
++                static int n = 0;
++                if ((n++ % 30) == 0) {
++                    LOG_INFO(Kernel_SVC, "Nx2MemInfo used={:#x} total={:#x}", *result,
++                             process->GetTotalNonSystemUserPhysicalMemorySize(system.Kernel()));
++                }
++            }
+             R_SUCCEED();
+         case InfoType::IsApplication:
+             *result = process->IsApplication();
+diff --git a/src/dynarmic/src/dynarmic/backend/x64/perf_map.cpp b/src/dynarmic/src/dynarmic/backend/x64/perf_map.cpp
+index eaa6c9e2b8..e90f906c9f 100644
+--- a/src/dynarmic/src/dynarmic/backend/x64/perf_map.cpp
++++ b/src/dynarmic/src/dynarmic/backend/x64/perf_map.cpp
+@@ -12,12 +12,16 @@
+ 
+ #include "dynarmic/backend/x64/perf_map.h"
+ #include "common/common_types.h"
+-#if defined(__linux__) && !defined(__ANDROID__)
++#if (defined(__linux__) && !defined(__ANDROID__)) || defined(_WIN32)
+ #    include <cstdio>
+ #    include <cstdlib>
+ #    include <mutex>
+-#    include <sys/types.h>
+-#    include <unistd.h>
++#    ifdef _WIN32
++#        include <process.h>
++#    else
++#        include <sys/types.h>
++#        include <unistd.h>
++#    endif
+ 
+ namespace Dynarmic::Backend::X64 {
+ 
+@@ -32,7 +36,11 @@ void OpenFile() {
+         return;
+     }
+ 
++#ifdef _WIN32
++    const int pid = _getpid();
++#else
+     const pid_t pid = getpid();
++#endif
+     const std::string filename = fmt::format("{:s}/perf-{:d}.map", perf_dir, pid);
+ 
+     file = std::fopen(filename.c_str(), "w");
+diff --git a/src/dynarmic/src/dynarmic/backend/x64/perf_map.h b/src/dynarmic/src/dynarmic/backend/x64/perf_map.h
+index 2d7530a6b0..6f506336fe 100644
+--- a/src/dynarmic/src/dynarmic/backend/x64/perf_map.h
++++ b/src/dynarmic/src/dynarmic/backend/x64/perf_map.h
+@@ -14,7 +14,7 @@
+ 
+ namespace Dynarmic::Backend::X64 {
+ 
+-#if defined(__linux__) && !defined(__ANDROID__)
++#if (defined(__linux__) && !defined(__ANDROID__)) || defined(_WIN32)
+ namespace detail {
+ void PerfMapRegister(const void* start, const void* end, std::string_view friendly_name);
+ }  // namespace detail
+diff --git a/src/shader_recompiler/ir_opt/global_memory_to_storage_buffer_pass.cpp b/src/shader_recompiler/ir_opt/global_memory_to_storage_buffer_pass.cpp
+index d5a5c65d28..3f215ec8f2 100644
+--- a/src/shader_recompiler/ir_opt/global_memory_to_storage_buffer_pass.cpp
++++ b/src/shader_recompiler/ir_opt/global_memory_to_storage_buffer_pass.cpp
+@@ -1125,7 +1125,7 @@ small_vector<StorageBufferAddr, 4> NativePointerCandidates(const IR::U32& low_ad
+                         const StorageBufferAddr pointer{.index = index.U32(),
+                                                         .offset = first + slot * stride};
+                         if (Common::IsAligned(pointer.offset, 8) &&
+-                            std::ranges::find(candidates, pointer) == candidates.end() &&
++                            std::ranges::find_if(candidates, [&](const StorageBufferAddr& e) { return e == pointer; }) == candidates.end() &&
+                             env.IsCbufStorageBufferPointer(pointer.index, pointer.offset)) {
+                             candidates.push_back(pointer);
+                             dynamic = true;
+@@ -1139,7 +1139,7 @@ small_vector<StorageBufferAddr, 4> NativePointerCandidates(const IR::U32& low_ad
+             }
+             const StorageBufferAddr pointer{.index = index.U32(), .offset = offset.U32()};
+             if (Common::IsAligned(pointer.offset, 8) &&
+-                std::ranges::find(candidates, pointer) == candidates.end() &&
++                std::ranges::find_if(candidates, [&](const StorageBufferAddr& e) { return e == pointer; }) == candidates.end() &&
+                 env.IsCbufStorageBufferPointer(pointer.index, pointer.offset)) {
+                 candidates.push_back(pointer);
+             }
+@@ -1202,7 +1202,7 @@ small_vector<StorageBufferAddr, 4> NativePointerCandidates(const IR::U32& low_ad
+             // table per object type: every slot whose table entry is a pointer). Those are table
+             // candidates, bound only in the bindings the other storage buffers leave free.
+             const auto add = [&](const StorageBufferAddr& pointer, bool table) {
+-                if (std::ranges::find(candidates, pointer) != candidates.end()) {
++                if (std::ranges::find_if(candidates, [&](const StorageBufferAddr& e) { return e == pointer; }) != candidates.end()) {
+                     return;
+                 }
+                 if (table && env.ShaderStage() != Stage::Compute) {
+@@ -1215,7 +1215,7 @@ small_vector<StorageBufferAddr, 4> NativePointerCandidates(const IR::U32& low_ad
+                     if (!info.tables_enabled) {
+                         return;
+                     }
+-                    if (std::ranges::find(info.table_candidates, pointer) ==
++                    if (std::ranges::find_if(info.table_candidates, [&](const StorageBufferAddr& e) { return e == pointer; }) ==
+                         info.table_candidates.end()) {
+                         info.table_candidates.push_back(pointer);
+                     }
+@@ -1337,7 +1337,7 @@ void CollectStorageBuffers(IR::Block& block, IR::Inst& inst, StorageInfo& info,
+             // run time. Rebasing on one of them drops the other path's accesses.
+             bool accepted{};
+             for (const StorageBufferAddr& candidate : candidates) {
+-                if (std::ranges::find(info.table_candidates, candidate) !=
++                if (std::ranges::find_if(info.table_candidates, [&](const StorageBufferAddr& e) { return e == candidate; }) !=
+                     info.table_candidates.end()) {
+                     const StorageBufferAddr holder{.index = candidate.index,
+                                                    .offset = candidate.offset};
+diff --git a/src/video_core/renderer_vulkan/vk_pipeline_cache.cpp b/src/video_core/renderer_vulkan/vk_pipeline_cache.cpp
+index fea9970409..3cc6bb870b 100644
+--- a/src/video_core/renderer_vulkan/vk_pipeline_cache.cpp
++++ b/src/video_core/renderer_vulkan/vk_pipeline_cache.cpp
+@@ -1193,6 +1193,13 @@ void PipelineCache::LoadDiskResources(u64 title_id, std::stop_token stop_loading
+                      error ? fmt::format(" (failed: {})", error.message()) : std::string{});
+         }
+     }
++    if (const size_t imported = VideoCommon::ImportOtherPipelineCaches(
++            pipeline_cache_filename, CACHE_VERSION, sizeof(GraphicsPipelineCacheKey),
++            sizeof(ComputePipelineCacheKey));
++        imported != 0) {
++        LOG_INFO(Render_Vulkan, "Pipeline cache import: {} pipelines added from other caches",
++                 imported);
++    }
+     used_pipelines = LoadUsedPipelines(used_pipelines_filename, MaxUsedPipelineAge(device));
+     used_pipelines_saved = std::chrono::steady_clock::now();
+     size_t skipped_pipelines = 0;
+diff --git a/src/video_core/shader_environment.cpp b/src/video_core/shader_environment.cpp
+index 34ab6dde52..c06071c3b8 100644
+--- a/src/video_core/shader_environment.cpp
++++ b/src/video_core/shader_environment.cpp
+@@ -5,6 +5,10 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ 
+ #include <algorithm>
++#include <vector>
++#include <iterator>
++#include <span>
++#include <unordered_set>
+ #include <array>
+ #include <atomic>
+ #include <cctype>
+@@ -1275,6 +1279,170 @@ void SerializePipeline(std::span<const char> key, std::span<const GenericEnviron
+     }
+ }
+ 
++namespace {
++// One cache record: its bytes, and its key's bytes (the dedup key).
++struct ImportedRecord {
++    std::string bytes;
++    std::string key;
++};
++
++// Reads every record of a cache file; nullopt unless all of them read to the file's exact end.
++std::optional<std::vector<ImportedRecord>> ReadAllRecords(const std::filesystem::path& path,
++                                                          size_t graphics_key_size,
++                                                          size_t compute_key_size,
++                                                          u32 cache_version) try {
++    std::ifstream file(path, std::ios::binary | std::ios::ate);
++    if (!file.is_open()) {
++        return std::nullopt;
++    }
++    file.exceptions(std::ifstream::failbit);
++    const std::streamoff end = file.tellg();
++    file.seekg(0, std::ios::beg);
++    std::array<char, 8> magic{};
++    u32 version{};
++    file.read(magic.data(), magic.size()).read(reinterpret_cast<char*>(&version), sizeof(version));
++    // Other cache versions read with the same sizes but mean other things (an import of them
++    // aborted at boot): only this version's files from other players or profiles merge.
++    if (magic != MAGIC_NUMBER || version != cache_version) {
++        return std::nullopt;
++    }
++    std::vector<ImportedRecord> records;
++    std::string raw;
++    while (static_cast<std::streamoff>(file.tellg()) != end) {
++        const std::streamoff start = file.tellg();
++        u32 num_envs{};
++        file.read(reinterpret_cast<char*>(&num_envs), sizeof(num_envs));
++        if (num_envs == 0 || num_envs > 6) {
++            return std::nullopt;
++        }
++        bool compute = false;
++        for (u32 i = 0; i < num_envs; ++i) {
++            // The counts lead each environment: reject what this format can't hold before
++            // Deserialize sizes vectors from them.
++            const std::streamoff env_start = file.tellg();
++            std::array<u64, 6> counts{};
++            file.read(reinterpret_cast<char*>(counts.data()), sizeof(counts));
++            if (counts[0] == 0 || counts[0] > (16u << 20) || counts[0] % 8 != 0 ||
++                std::any_of(counts.begin() + 1, counts.end(),
++                            [](u64 count) { return count > 65536; })) {
++                return std::nullopt;
++            }
++            file.seekg(env_start);
++            FileEnvironment env;
++            env.Deserialize(file);
++            if (static_cast<u32>(env.ShaderStage()) > static_cast<u32>(Shader::Stage::Mesh)) {
++                return std::nullopt;
++            }
++            if (i == 0) {
++                compute = env.ShaderStage() == Shader::Stage::Compute;
++            } else if (env.ShaderStage() == Shader::Stage::Compute) {
++                return std::nullopt;
++            }
++        }
++        if (compute && num_envs != 1) {
++            return std::nullopt;
++        }
++        const size_t key_size = compute ? compute_key_size : graphics_key_size;
++        const std::streamoff key_start = file.tellg();
++        if (key_start + static_cast<std::streamoff>(key_size) > end) {
++            return std::nullopt;
++        }
++        const std::streamoff record_end = key_start + static_cast<std::streamoff>(key_size);
++        raw.resize(static_cast<size_t>(record_end - start));
++        file.seekg(start);
++        file.read(raw.data(), static_cast<std::streamsize>(raw.size()));
++        records.push_back({raw, raw.substr(static_cast<size_t>(key_start - start))});
++    }
++    return records;
++} catch (const std::exception&) {
++    return std::nullopt;
++}
++} // Anonymous namespace
++
++size_t ImportOtherPipelineCaches(const std::filesystem::path& own, u32 cache_version,
++                                 size_t graphics_key_size, size_t compute_key_size) try {
++    if (const char* value = std::getenv("EDEN_NX2_IMPORT_CACHES"); value && value[0] == '0') {
++        return 0;
++    }
++    const std::filesystem::path dir = own.parent_path();
++    std::filesystem::path list_path = own;
++    list_path += ".imported.txt";
++    std::string done;
++    if (std::ifstream list(list_path, std::ios::binary); list.is_open()) {
++        done.assign(std::istreambuf_iterator<char>(list), std::istreambuf_iterator<char>());
++    }
++    std::vector<std::filesystem::path> candidates;
++    std::error_code error;
++    for (const auto& entry : std::filesystem::directory_iterator(dir, error)) {
++        if (!entry.is_regular_file(error) || entry.path() == own) {
++            continue;
++        }
++        const std::string name = Common::FS::PathToUTF8String(entry.path().filename());
++        if (!name.starts_with("vulkan") || !name.ends_with(".bin") ||
++            name.find("_used") != std::string::npos || name.find("_pipelines") != std::string::npos ||
++            name.find("static") != std::string::npos) {
++            continue;
++        }
++        const std::string tag = fmt::format("{} {}\n", name, entry.file_size(error));
++        if (done.find(tag) != std::string::npos) {
++            continue;
++        }
++        candidates.push_back(entry.path());
++    }
++    if (candidates.empty()) {
++        return 0;
++    }
++    std::unordered_set<std::string> keys;
++    if (std::filesystem::exists(own, error)) {
++        const auto mine = ReadAllRecords(own, graphics_key_size, compute_key_size, cache_version);
++        if (!mine) {
++            LOG_WARNING(Render_Vulkan, "Pipeline cache import: this build's own cache does not read "
++                                       "to its end; nothing imported");
++            return 0;
++        }
++        for (const auto& record : *mine) {
++            keys.insert(record.key);
++        }
++    }
++    size_t added = 0;
++    {
++        // tellp() reads 0 on a file opened for appending until the first write: a second header
++        // in the middle of the file made every build abort reading it.
++        const bool has_header = std::filesystem::exists(own, error) &&
++                                std::filesystem::file_size(own, error) >= MAGIC_NUMBER.size() + sizeof(u32);
++        std::ofstream out(own, std::ios::binary | std::ios::app);
++        out.exceptions(std::ofstream::failbit);
++        if (!has_header) {
++            out.write(MAGIC_NUMBER.data(), MAGIC_NUMBER.size())
++                .write(reinterpret_cast<const char*>(&cache_version), sizeof(cache_version));
++        }
++        std::ofstream list(list_path, std::ios::binary | std::ios::app);
++        for (const auto& path : candidates) {
++            const std::string name = Common::FS::PathToUTF8String(path.filename());
++            const auto records = ReadAllRecords(path, graphics_key_size, compute_key_size, cache_version);
++            size_t file_added = 0;
++            if (records) {
++                for (const auto& record : *records) {
++                    if (keys.insert(record.key).second) {
++                        out.write(record.bytes.data(),
++                                  static_cast<std::streamsize>(record.bytes.size()));
++                        ++file_added;
++                    }
++                }
++            }
++            LOG_INFO(Render_Vulkan, "Pipeline cache import: {} {} ({} records, {} new)", name,
++                     records ? "read" : "skipped (another cache version or format)",
++                     records ? records->size() : size_t{0}, file_added);
++            added += file_added;
++            list << fmt::format("{} {}\n", name, std::filesystem::file_size(path, error));
++        }
++    }
++    return added;
++} catch (const std::exception& e) {
++    LOG_ERROR(Render_Vulkan, "Pipeline cache import failed: {}", e.what());
++    return 0;
++}
++
+ void LoadPipelines(
+     std::stop_token stop_loading, const std::filesystem::path& filename, u32 expected_cache_version,
+     Common::UniqueFunction<void, std::ifstream&, FileEnvironment> load_compute,
+diff --git a/src/video_core/shader_environment.h b/src/video_core/shader_environment.h
+index 4c4c9259c1..d3d881fe1b 100644
+--- a/src/video_core/shader_environment.h
++++ b/src/video_core/shader_environment.h
+@@ -286,6 +286,14 @@ void SerializePipeline(const Key& key, const Envs& envs, const std::filesystem::
+     SerializePipeline(std::span(reinterpret_cast<const char*>(&key), sizeof(key)), std::span(envs.data(), envs.size()), filename, cache_version);
+ }
+ 
++/// Appends to `own` the pipelines of the other cache files in its folder (vulkan*.bin of this
++/// cache version, e.g. a cache another player shared) that it lacks. A file is taken only if it
++/// has this cache version and every record in it reads to its exact end; anything else is left
++/// alone. Each
++/// file is read once (listed in <own>.imported.txt). Returns the number of records added.
++size_t ImportOtherPipelineCaches(const std::filesystem::path& own, u32 cache_version,
++                                 size_t graphics_key_size, size_t compute_key_size);
++
+ void LoadPipelines(std::stop_token stop_loading, const std::filesystem::path& filename, u32 expected_cache_version,
+     Common::UniqueFunction<void, std::ifstream&, FileEnvironment> load_compute,
+     Common::UniqueFunction<void, std::ifstream&, std::vector<FileEnvironment>> load_graphics);
+diff --git a/src/video_core/texture_cache/texture_cache.h b/src/video_core/texture_cache/texture_cache.h
+index 8ca5df2337..746f671b4b 100644
+--- a/src/video_core/texture_cache/texture_cache.h
++++ b/src/video_core/texture_cache/texture_cache.h
+@@ -260,7 +260,10 @@ void TextureCache<P>::ApplyThresholdOverrides(bool log) {
+     // On every GPU: past what a frame needs, more device memory only keeps the textures of earlier
+     // scenes (title 1 filled 6.7 GB of an 8 GB card and draws its races in ~5 GB), so collect from
+     // MaxCriticalMemory on rather than near the card's budget.
+-    critical_memory = (std::min)(critical_memory, MaxCriticalMemory);
++    // Cards with a large budget (16 GB: ~15 GB) keep up to 3/4 of it: Ocarina's village alone
++    // keeps ~8 GB of textures, and under the 5 GiB cap the collector deleted and re-uploaded
++    // thousands of them every 20 s (~15% of the GPU back thread, 26-28 ms frames -> 23-24 ms).
++    critical_memory = (std::min)(critical_memory, (std::max)(MaxCriticalMemory, large_budget_cap));
+     expected_memory =
+         (std::min)(expected_memory, critical_memory - (std::min)(critical_memory, u64{768_MiB}));
+     minimum_memory =
+@@ -332,6 +335,7 @@ void TextureCache<P>::TickFrame() {
+             if (native_thresholds_applied && budget_check_frames++ % 30 == 0) {
+                 const u64 budget = runtime.GetDeviceMemoryBudget();
+                 if (budget > 2_GiB) {
++                    large_budget_cap = budget >= 12_GiB ? budget / 4 * 3 : 0;
+                     const u64 old_critical = critical_memory;
+                     const u64 margin = (std::min)(budget / 8, 1_GiB);
+                     if constexpr (requires { runtime.GetDeviceMemorySlack(); }) {
+diff --git a/src/video_core/texture_cache/texture_cache_base.h b/src/video_core/texture_cache/texture_cache_base.h
+index 87d0d7971f..1d2a8811fa 100644
+--- a/src/video_core/texture_cache/texture_cache_base.h
++++ b/src/video_core/texture_cache/texture_cache_base.h
+@@ -152,6 +152,7 @@ class TextureCache : public VideoCommon::ChannelSetupCaches<TextureCacheChannelI
+     /// The most device memory the collector lets the cache fill before it collects in earnest,
+     /// on every GPU (ApplyThresholdOverrides).
+     static constexpr u64 MaxCriticalMemory = 5_GiB;
++    u64 large_budget_cap{}; ///< Raises MaxCriticalMemory on cards with a 12 GiB+ budget
+     static constexpr size_t GC_EMERGENCY_COUNTS = 2;
+ 
+     using Runtime = typename P::Runtime;
