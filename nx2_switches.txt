@@ -37,7 +37,7 @@ EDEN_NX2_FENCE_BATCH=1
 #EDEN_NX2_AUTO_STUB=1
 #EDEN_NX2_KEEP_ASTC=1
 
-# --- chuppatricky-amd-testbuild (Ocarina of Time on AMD) ---
+# --- Lichii Fork MDias v5 (Ocarina of Time em AMD Radeon) ---
 # Ocarina of Time fog: reduced, on, off or original. Change the value below, or put the line in your own
 # %APPDATA%\eden\nx2_switches.txt (it wins over this file) and restart.
 #   reduced: the outdoor haze thinned to 1/4 and the final exposure lowered to 0.65 (closer to the
@@ -76,6 +76,6 @@ EDEN_NX2_LOG_PIPELINE_COMPILES=1
 # vegetation compute shaders the Max Resolution mode added: less fog, light and grass.
 # EDEN_NX2_REJECT_HASH=0051f3226c2ac35e,7ca59d64e659a9e1,9a24d120a5fa2a93,affbb36232fcda8f,e311d97dbe057ad3,394cb954427f6336
 
-# --- sharkiix v3 ---
-# Verrouillage a 30 images/s (rythme parfaitement regulier). Enlevez le # pour l'activer.
+# --- Lichii Fork MDias v5 ---
+# Trava em 30 FPS estável (ritmo homogêneo perfeito). Remova o # para ativar.
 #EDEN_NX2_SWAP_INTERVAL=2

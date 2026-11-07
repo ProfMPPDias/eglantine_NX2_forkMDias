@@ -4399,7 +4399,7 @@ void MainWindow::OnApplicationChanged(u64 program_id) {
 void MainWindow::UpdateWindowTitle(std::string_view title_name, std::string_view title_version,
                                    std::string_view gpu_vendor) {
     static const std::string build_id = std::string{Common::g_build_id};
-    static const std::string yuzu_title = "fork MDias v2.0 - AMD";
+    static const std::string yuzu_title = "Lichii | Fork MDias v5 | Clang 22.1.8";
 
     const auto override_title =
         fmt::format(fmt::runtime(std::string(Common::g_title_bar_format_idle)), build_id);
