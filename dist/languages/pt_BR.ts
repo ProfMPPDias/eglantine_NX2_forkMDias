@@ -3,6 +3,10 @@
 <context>
     <name>AboutDialog</name>
     <message>
+        <source>&lt;p&gt;&lt;span style="font-size:24pt;"&gt;Lichii Fork MDias v5&lt;/span&gt;&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;span style="font-size:24pt;"&gt;Lichii Fork MDias v5&lt;/span&gt;&lt;/p&gt;</translation>
+    </message>
+    <message>
         <location filename="../../src/yuzu/aboutdialog.ui" line="14" />
         <source>About Eden</source>
         <translation>Sobre Lichii</translation>
@@ -221,6 +225,34 @@ Isto banirá tanto o nome de usuário como o endereço IP do fórum.</translatio
 </context>
 <context>
     <name>ConfigurationShared</name>
+    <message>
+        <source>Ocarina of Time: 30 FPS mode (lower-end PCs)</source>
+        <translation>Ocarina of Time: modo 30 FPS (PCs modestos)</translation>
+    </message>
+    <message>
+        <source>Caps Ocarina of Time at 30 FPS. The game keeps its normal speed. Takes effect at once; the 60 FPS / 30 FPS button in the status bar switches it too.</source>
+        <translation>Limita Ocarina of Time a 30 FPS. O jogo mantém sua velocidade normal. Surte efeito imediatamente; o botão de 60 FPS / 30 FPS na barra de status também alterna.</translation>
+    </message>
+    <message>
+        <source>Mario Kart World: 30 FPS mode</source>
+        <translation>Mario Kart World: modo 30 FPS</translation>
+    </message>
+    <message>
+        <source>Forces the game to use its native 30 FPS mode at normal game speed.</source>
+        <translation>Força o jogo a usar seu modo nativo de 30 FPS na velocidade normal do jogo.</translation>
+    </message>
+    <message>
+        <source>Ocarina of Time frame rate</source>
+        <translation>Taxa de quadros de Ocarina of Time</translation>
+    </message>
+    <message>
+        <source>Which frame rate should Ocarina of Time run at?</source>
+        <translation>Em qual taxa de quadros Ocarina of Time deve rodar?</translation>
+    </message>
+    <message>
+        <source>30 FPS (lower-end PCs)</source>
+        <translation>30 FPS (PCs modestos)</translation>
+    </message>
     <message>
         <location filename="../../src/yuzu/configuration/shared_widget.cpp" line="67" />
         <source>%</source>
@@ -3236,6 +3268,38 @@ Gostaria de deletar o salvamento antigo?</translation>
 <message><source>Lichii</source><translation>Lichii Fork MDias v5</translation></message></context>
 <context>
     <name>ConfigureGraphics</name>
+    <message>
+        <source>Ocarina of Time: 30 FPS mode (lower-end PCs)</source>
+        <translation>Ocarina of Time: modo 30 FPS (PCs modestos)</translation>
+    </message>
+    <message>
+        <source>Caps Ocarina of Time at 30 FPS. The game keeps its normal speed. Takes effect at once; the 60 FPS / 30 FPS button in the status bar switches it too.</source>
+        <translation>Limita Ocarina of Time a 30 FPS. O jogo mantém sua velocidade normal. Surte efeito imediatamente; o botão de 60 FPS / 30 FPS na barra de status também alterna.</translation>
+    </message>
+    <message>
+        <source>Mario Kart World: 30 FPS mode</source>
+        <translation>Mario Kart World: modo 30 FPS</translation>
+    </message>
+    <message>
+        <source>Forces the game to use its native 30 FPS mode at normal game speed.</source>
+        <translation>Força o jogo a usar seu modo nativo de 30 FPS na velocidade normal do jogo.</translation>
+    </message>
+    <message>
+        <source>Ocarina of Time frame rate</source>
+        <translation>Taxa de quadros de Ocarina of Time</translation>
+    </message>
+    <message>
+        <source>Which frame rate should Ocarina of Time run at?</source>
+        <translation>Em qual taxa de quadros Ocarina of Time deve rodar?</translation>
+    </message>
+    <message>
+        <source>60 FPS</source>
+        <translation>60 FPS</translation>
+    </message>
+    <message>
+        <source>30 FPS (lower-end PCs)</source>
+        <translation>30 FPS (PCs modestos)</translation>
+    </message>
     <message>
         <location filename="../../src/yuzu/configuration/configure_graphics.ui" line="14" />
         <source>Form</source>
@@ -6906,6 +6970,44 @@ Mensagem de Depuração: </translation>
 </context>
 <context>
     <name>MainWindow</name>
+    <message>
+        <source>Ocarina of Time frame rate</source>
+        <translation>Taxa de quadros de Ocarina of Time</translation>
+    </message>
+    <message>
+        <source>Which frame rate should Ocarina of Time run at?</source>
+        <translation>Em qual taxa de quadros Ocarina of Time deve rodar?</translation>
+    </message>
+    <message>
+        <source>60 FPS needs a fast, recent CPU.
+30 FPS is for lower-end PCs. The game keeps its normal speed either way.
+
+Switch any time with the 60 FPS / 30 FPS button at the bottom of the window.</source>
+        <translation>60 FPS requer uma CPU rápida e recente.
+30 FPS é recomendado para PCs mais modestos. O jogo mantém sua velocidade normal em ambos os modos.
+
+Alterne a qualquer momento pelo botão 60 FPS / 30 FPS na barra inferior da janela.</translation>
+    </message>
+    <message>
+        <source>60 FPS</source>
+        <translation>60 FPS</translation>
+    </message>
+    <message>
+        <source>30 FPS (lower-end PCs)</source>
+        <translation>30 FPS (PCs modestos)</translation>
+    </message>
+    <message>
+        <source>Ocarina of Time frame rate. Click to switch between 60 FPS and 30 FPS (lower-end PCs); it takes effect at once.</source>
+        <translation>Taxa de quadros de Ocarina of Time. Clique para alternar entre 60 FPS e 30 FPS (PCs modestos); surte efeito imediatamente.</translation>
+    </message>
+    <message>
+        <source>Ocarina of Time: 30 FPS mode (lower-end PCs)</source>
+        <translation>Ocarina of Time: modo 30 FPS (PCs modestos)</translation>
+    </message>
+    <message>
+        <source>Caps Ocarina of Time at 30 FPS. The game keeps its normal speed. Takes effect at once; the 60 FPS / 30 FPS button in the status bar switches it too.</source>
+        <translation>Limita Ocarina of Time a 30 FPS. O jogo mantém sua velocidade normal. Surte efeito imediatamente; o botão de 60 FPS / 30 FPS na barra de status também alterna.</translation>
+    </message>
     <message>
         <location filename="../../src/yuzu/main.ui" line="14" />
         <source>yuzu</source>

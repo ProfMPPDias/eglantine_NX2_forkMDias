@@ -40,6 +40,14 @@ A versão **v5** foi reconstruída utilizando o toolchain de compilação **Clan
 - Menus (**Arquivo**, **Emulação**, **Exibir**, **Ferramentas**, **Ajuda**), caixas de diálogo, notificações de sistema, atalhos e janelas de configurações traduzidos nativamente.
 - O arquivo de tradução compilado `languages/pt_BR.qm` acompanha o executável, configurado para ativação automática imediata via modo portátil.
 
+
+### 3.1 Tradução do Diálogo Inicial de Taxa de Quadros (Ocarina of Time)
+- Ao iniciar a aplicação pela primeira vez ou executar *The Legend of Zelda: Ocarina of Time*, a caixa de diálogo de seleção de taxa de quadros (30 FPS vs 60 FPS) e os controles associados na barra de status e configurações estão **100% traduzidos para o Português Brasileiro (PT-BR)**:
+  - Título: *Taxa de quadros de Ocarina of Time*
+  - Pergunta: *Em qual taxa de quadros Ocarina of Time deve rodar?*
+  - Opções: *60 FPS* / *30 FPS (PCs modestos)*
+  - Descrição explicativa detalhada sobre desempenho de CPU e alternância a qualquer momento via barra de status inferior.
+
 ### 4. Cache de Shaders Compartilhado (Shared Shader Cache)
 - Se outro jogador disponibilizar seu cache compilado, você não precisará mais compilar os mesmos shaders do zero, eliminando micro-travamentos (*stutters*) ao explorar novos cenários e masmorras.
 - O arquivo pode ser nomeado (ex: `vulkan-amigo.bin`), desde que inicie com `vulkan` e termine com `.bin`.

@@ -20,6 +20,10 @@ O **Lichii Fork MDias v5** consolida o amadurecimento do emulador especializado 
    - Caixa de diálogo Sobre exibindo `Lichii Fork MDias v5`.
    - Menus, janelas de opções, configurações gráficas e atalhos em Português Brasileiro nativo.
 
+
+- **Tradução Completa do Diálogo Ocarina of Time (30 FPS vs 60 FPS):**
+  - O diálogo exibido na primeira execução perguntando sobre a taxa de quadros (30 FPS vs 60 FPS) de The Legend of Zelda: Ocarina of Time, bem como os botões e tooltips da barra de status e janela de configurações gráficas, foram integralmente traduzidos para o Português Brasileiro nativo.
+
 4. **Performance Gráfica e NX2:**
    - Dynamic FPS integrado diretamente ao core.
    - Cache de shaders persistente e mesclagem antecipada no boot.
